@@ -3,21 +3,6 @@ defmodule Typesense do
   Documentation for `Typesense`.
   """
 
-  @doc """
-  Get health information about a Typesense node.
-
-  ## Examples
-
-      iex> Typesense.health()
-      :ok
-
-  """
-
-  def health(opts \\ []) do
-    client(opts)
-    |> Tesla.get("/health")
-  end
-
   # build dynamic client based on runtime arguments
   def client(opts \\ []) do
     middleware = [
