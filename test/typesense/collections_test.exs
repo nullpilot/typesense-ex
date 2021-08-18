@@ -1,6 +1,8 @@
 defmodule Typesense.CollectionsTest do
   use ExUnit.Case
 
+  import Typesense.Factory
+
   setup do
     client = Typesense.client()
 
@@ -8,80 +10,36 @@ defmodule Typesense.CollectionsTest do
   end
 
   test "creates a new collection", %{client: client} do
-    schema = %{
-      "name" => "companies",
-      "fields" => [
-        %{
-          "name" => "company_name",
-          "type" => "string",
-          "facet" => false
-        },
-        %{
-          "name" => "num_employees",
-          "type" => "int32",
-          "facet" => false
-        },
-        %{
-          "name" => "country",
-          "type" => "string",
-          "facet" => true
-        }
-      ],
-      "default_sorting_field" => "num_employees"
-    }
+    schema = build(:collection, %{"name" => "createcollection"})
 
     assert {:ok, %Tesla.Env{} = env} = Typesense.Collections.create(client, schema)
     assert env.status == 201
 
     assert %{
-             "name" => "companies",
-             "num_documents" => 0,
-             "fields" => [
-               %{"name" => "company_name", "type" => "string"},
-               %{"name" => "num_employees", "type" => "int32"},
-               %{"name" => "country", "type" => "string", "facet" => true}
-             ],
-             "default_sorting_field" => "num_employees"
-           } = env.body
+      "name" => "createcollection",
+      "num_documents" => _,
+      "created_at" => _,
+      "fields" => _,
+      "default_sorting_field" => _,
+      "num_memory_shards" => _
+    } = env.body
   end
 
   test "retrieves an existing collection", %{client: client} do
-    schema = %{
-      "name" => "companies_ret",
-      "fields" => [
-        %{
-          "name" => "company_name",
-          "type" => "string",
-          "facet" => false
-        },
-        %{
-          "name" => "num_employees",
-          "type" => "int32",
-          "facet" => false
-        },
-        %{
-          "name" => "country",
-          "type" => "string",
-          "facet" => true
-        }
-      ],
-      "default_sorting_field" => "num_employees"
-    }
+    schema = build(:collection, %{"name" => "retrievecollection"})
 
     {:ok, %Tesla.Env{} = _} = Typesense.Collections.create(client, schema)
 
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Collections.retrieve(client, "companies_ret")
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Collections.retrieve(client, "retrievecollection")
     assert env.status == 200
 
     assert %{
-             "name" => "companies_ret",
-             "num_documents" => 0,
-             "fields" => [
-               %{"name" => "company_name", "type" => "string"},
-               %{"name" => "num_employees", "type" => "int32"},
-               %{"name" => "country", "type" => "string", "facet" => true}
-             ],
-             "default_sorting_field" => "num_employees"
-           } = env.body
+      "name" => "retrievecollection",
+      "num_documents" => _,
+      "created_at" => _,
+      "fields" => _,
+      "default_sorting_field" => _,
+      "num_memory_shards" => _
+    } = env.body
   end
 end
