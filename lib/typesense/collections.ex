@@ -12,4 +12,9 @@ defmodule Typesense.Collections do
     client
     |> Tesla.get("/collections/#{collection}")
   end
+
+  def list(client) do
+    client
+    |> Tesla.get("/collections")
+  end
 end
