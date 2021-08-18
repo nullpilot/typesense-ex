@@ -54,10 +54,34 @@ defmodule Typesense.CollectionsTest do
     assert env.status == 200
     assert is_list(env.body)
 
-    collection_names = env.body
+    assert contains?(env.body, ["listcollection1", "listcollection2"])
+  end
+
+  test "deletes an existing collection", %{client: client} do
+    schema = build(:collection, %{"name" => "deletecollection"})
+
+    # make sure collection is added successfully
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Collections.create(client, schema)
+    assert env.status == 201
+
+    # confirm
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Collections.list(client)
+    assert contains?(env.body, ["deletecollection"])
+
+    # delete collection again
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Collections.delete(client, "deletecollection")
+    assert env.status == 200
+
+    # confirm
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Collections.list(client)
+    refute contains?(env.body, ["deletecollection"])
+  end
+
+  defp contains?(collection_list, names_to_check) when is_list(names_to_check) do
+    collection_names = collection_list
     |> Enum.map(&(Map.fetch!(&1, "name")))
 
-    assert Enum.member?(collection_names, "listcollection1")
-    assert Enum.member?(collection_names, "listcollection2")
+    names_to_check
+    |> Enum.all?(&(Enum.member?(collection_names, &1)))
   end
 end

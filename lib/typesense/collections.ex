@@ -17,4 +17,9 @@ defmodule Typesense.Collections do
     client
     |> Tesla.get("/collections")
   end
+
+  def delete(client, collection) do
+    client
+    |> Tesla.delete("/collections/#{collection}")
+  end
 end
