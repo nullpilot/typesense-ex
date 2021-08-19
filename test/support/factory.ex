@@ -10,9 +10,7 @@ defmodule Typesense.Factory do
           "name" => "order",
           "type" => "int32",
           "facet" => false
-        }),
-        build(:field),
-        build(:field)
+        })
       ]
     }
   end
@@ -22,6 +20,13 @@ defmodule Typesense.Factory do
       "name" => sequence("field"),
       "type" => "int32",
       "facet" => false
+    }
+  end
+
+  def document_factory do
+    %{
+      "id" => sequence("doc_id_"),
+      "order" => 1
     }
   end
 end
