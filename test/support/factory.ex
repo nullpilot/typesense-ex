@@ -1,4 +1,6 @@
 defmodule Typesense.Factory do
+  @moduledoc false
+
   use ExMachina
 
   def collection_factory do

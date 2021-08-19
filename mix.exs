@@ -10,7 +10,7 @@ defmodule Typesense.MixProject do
       deps: deps(),
 
       # Testing
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_paths: elixirc_paths(Mix.env()),
 
       # Docs
       name: "Typesense"

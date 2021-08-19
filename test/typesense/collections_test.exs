@@ -16,13 +16,13 @@ defmodule Typesense.CollectionsTest do
     assert env.status == 201
 
     assert %{
-      "name" => "createcollection",
-      "num_documents" => _,
-      "created_at" => _,
-      "fields" => _,
-      "default_sorting_field" => _,
-      "num_memory_shards" => _
-    } = env.body
+             "name" => "createcollection",
+             "num_documents" => _,
+             "created_at" => _,
+             "fields" => _,
+             "default_sorting_field" => _,
+             "num_memory_shards" => _
+           } = env.body
   end
 
   test "retrieves an existing collection", %{client: client} do
@@ -30,17 +30,19 @@ defmodule Typesense.CollectionsTest do
 
     Typesense.Collections.create(client, schema)
 
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Collections.retrieve(client, "retrievecollection")
+    assert {:ok, %Tesla.Env{} = env} =
+             Typesense.Collections.retrieve(client, "retrievecollection")
+
     assert env.status == 200
 
     assert %{
-      "name" => "retrievecollection",
-      "num_documents" => _,
-      "created_at" => _,
-      "fields" => _,
-      "default_sorting_field" => _,
-      "num_memory_shards" => _
-    } = env.body
+             "name" => "retrievecollection",
+             "num_documents" => _,
+             "created_at" => _,
+             "fields" => _,
+             "default_sorting_field" => _,
+             "num_memory_shards" => _
+           } = env.body
   end
 
   test "lists all existing collections", %{client: client} do
@@ -78,10 +80,11 @@ defmodule Typesense.CollectionsTest do
   end
 
   defp contains?(collection_list, names_to_check) when is_list(names_to_check) do
-    collection_names = collection_list
-    |> Enum.map(&(Map.fetch!(&1, "name")))
+    collection_names =
+      collection_list
+      |> Enum.map(&Map.fetch!(&1, "name"))
 
     names_to_check
-    |> Enum.all?(&(Enum.member?(collection_names, &1)))
+    |> Enum.all?(&Enum.member?(collection_names, &1))
   end
 end
