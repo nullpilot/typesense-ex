@@ -28,7 +28,14 @@ defmodule Typesense.Factory do
   def document_factory do
     %{
       "id" => sequence("doc_id_"),
-      "order" => 1
+      "order" => sequence(:doc_order, & &1)
+    }
+  end
+
+  def search_factory do
+    %{
+      "q" => "",
+      "query_by" => "name"
     }
   end
 end
