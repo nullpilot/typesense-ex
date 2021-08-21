@@ -3,53 +3,49 @@ defmodule Typesense.DocumentsTest do
 
   import Typesense.Factory
 
-  setup do
+  setup_all do
     client = Typesense.client()
+    collection_name = "doccollection"
 
-    {:ok, %{client: client}}
-  end
-
-  test "create a new document", %{client: client} do
     order_field =
       build(:field, %{
         "name" => "order",
         "type" => "int32"
       })
 
-    schema =
-      build(:collection, %{
-        "name" => "createdoc_collection",
-        "default_sorting_field" => "order",
-        "fields" => [order_field]
+    text_field =
+      build(:field, %{
+        "name" => "name",
+        "type" => "string"
       })
 
+    schema =
+      build(:collection, %{
+        "name" => collection_name,
+        "fields" => [
+          order_field
+        ]
+      })
+
+    {:ok, %{status: 201}} = Typesense.Collections.create(client, schema)
+
+    on_exit(fn -> Typesense.Collections.delete(client, collection_name) end)
+
+    {:ok, %{client: client, collection: collection_name}}
+  end
+
+  test "create a new document", %{client: client, collection: collection} do
     doc =
       build(:document, %{
         "order" => 1
       })
 
-    Typesense.Collections.create(client, schema)
-
-    assert {:ok, %Tesla.Env{} = env} =
-             Typesense.Documents.create(client, "createdoc_collection", doc)
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Documents.create(client, collection, doc)
 
     assert env.status == 201
   end
 
-  test "upsert an existing document", %{client: client} do
-    order_field =
-      build(:field, %{
-        "name" => "order",
-        "type" => "int32"
-      })
-
-    schema =
-      build(:collection, %{
-        "name" => "upsertdoc_collection",
-        "default_sorting_field" => "order",
-        "fields" => [order_field]
-      })
-
+  test "upsert an existing document", %{client: client, collection: collection} do
     doc =
       build(:document, %{
         "id" => "1",
@@ -62,13 +58,22 @@ defmodule Typesense.DocumentsTest do
         "order" => 2
       })
 
-    Typesense.Collections.create(client, schema)
-    Typesense.Documents.create(client, "upsertdoc_collection", doc)
+    Typesense.Documents.create(client, collection, doc)
 
-    {:ok, %Tesla.Env{} = env} =
-      Typesense.Documents.upsert(client, "upsertdoc_collection", updated_doc)
-
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Documents.upsert(client, collection, updated_doc)
     assert env.status == 201
     assert env.body == %{"id" => "1", "order" => 2}
+  end
+
+  test "retrieve an existing document", %{client: client, collection: collection} do
+    doc =
+      build(:document, %{
+        "id" => "ret"
+      })
+
+    Typesense.Documents.create(client, collection, doc)
+
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Documents.retrieve(client, collection, doc["id"])
+    assert env.status == 200
   end
 end
