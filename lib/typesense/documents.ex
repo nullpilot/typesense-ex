@@ -13,6 +13,11 @@ defmodule Typesense.Documents do
     |> Tesla.post("/collections/#{collection}/documents", document, query: [action: "upsert"])
   end
 
+  def update(client, collection, document_id, document) do
+    client
+    |> Tesla.patch("/collections/#{collection}/documents/#{document_id}", document)
+  end
+
   def retrieve(client, collection, document_id) do
     client
     |> Tesla.get("/collections/#{collection}/documents/#{document_id}")

@@ -13,12 +13,6 @@ defmodule Typesense.DocumentsTest do
         "type" => "int32"
       })
 
-    text_field =
-      build(:field, %{
-        "name" => "name",
-        "type" => "string"
-      })
-
     schema =
       build(:collection, %{
         "name" => collection_name,
@@ -75,5 +69,23 @@ defmodule Typesense.DocumentsTest do
 
     assert {:ok, %Tesla.Env{} = env} = Typesense.Documents.retrieve(client, collection, doc["id"])
     assert env.status == 200
+  end
+
+  test "update an existing document", %{client: client, collection: collection} do
+    doc =
+      build(:document, %{
+        "id" => "update",
+        "order" => 10
+      })
+
+    Typesense.Documents.create(client, collection, doc)
+
+    update_doc = %{doc | "order" => 11}
+
+    assert {:ok, %Tesla.Env{} = env} =
+             Typesense.Documents.update(client, collection, doc["id"], update_doc)
+
+    assert env.status == 201
+    assert %{"id" => "update", "order" => 11} == env.body
   end
 end
