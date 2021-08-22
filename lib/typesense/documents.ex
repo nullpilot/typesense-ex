@@ -23,6 +23,14 @@ defmodule Typesense.Documents do
     |> Tesla.get("/collections/#{collection}/documents/#{document_id}")
   end
 
+  @doc """
+  Export documents from a collection. Note that the result is returned as string and not parsed into JSON.
+  """
+  def export(client, collection, export_params \\ []) do
+    client
+    |> Tesla.get("/collections/#{collection}/documents/export", query: export_params)
+  end
+
   def delete(client, collection, document_id) do
     client
     |> Tesla.delete("/collections/#{collection}/documents/#{document_id}")

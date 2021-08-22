@@ -113,4 +113,17 @@ defmodule Typesense.DocumentsTest do
     assert env.status == 200
     assert env.body == %{"num_deleted" => 2}
   end
+
+  test "export documents", %{client: client, collection: collection} do
+    doc1 = build(:document)
+    doc2 = build(:document)
+
+    Typesense.Documents.create(client, collection, doc1)
+    Typesense.Documents.create(client, collection, doc2)
+
+    assert {:ok, %Tesla.Env{} = env} =
+             Typesense.Documents.export(client, collection)
+
+    assert env.status == 200
+  end
 end
