@@ -23,6 +23,18 @@ defmodule Typesense.Documents do
     |> Tesla.get("/collections/#{collection}/documents/#{document_id}")
   end
 
+  def delete(client, collection, document_id) do
+    client
+    |> Tesla.delete("/collections/#{collection}/documents/#{document_id}")
+  end
+
+  def delete_by_query(client, collection, filter, batch_size \\ 100) do
+    client
+    |> Tesla.delete("/collections/#{collection}/documents",
+      query: [filter_by: filter, batch_size: batch_size]
+    )
+  end
+
   def search(client, collection, search_params) do
     client
     |> Tesla.get("/collections/#{collection}/documents/search", query: search_params)

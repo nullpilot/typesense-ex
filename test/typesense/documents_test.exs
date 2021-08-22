@@ -86,6 +86,31 @@ defmodule Typesense.DocumentsTest do
              Typesense.Documents.update(client, collection, doc["id"], update_doc)
 
     assert env.status == 201
-    assert %{"id" => "update", "order" => 11} == env.body
+    assert env.body == %{"id" => "update", "order" => 11}
+  end
+
+  test "delete an existing document", %{client: client, collection: collection} do
+    doc = build(:document)
+
+    Typesense.Documents.create(client, collection, doc)
+
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Documents.delete(client, collection, doc["id"])
+
+    assert env.status == 200
+  end
+
+  test "delete documents by query", %{client: client, collection: collection} do
+    doc1 = build(:document, %{"order" => 700})
+    doc2 = build(:document, %{"order" => 700})
+    filter = "order:=700"
+
+    Typesense.Documents.create(client, collection, doc1)
+    Typesense.Documents.create(client, collection, doc2)
+
+    assert {:ok, %Tesla.Env{} = env} =
+             Typesense.Documents.delete_by_query(client, collection, filter)
+
+    assert env.status == 200
+    assert env.body == %{"num_deleted" => 2}
   end
 end
