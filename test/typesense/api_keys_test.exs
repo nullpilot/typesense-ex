@@ -30,4 +30,10 @@ defmodule Typesense.ApiKeysTest do
     assert {:ok, %Tesla.Env{} = env} = Typesense.ApiKeys.retrieve(client, key_id)
     assert env.status == 200
   end
+
+  test "list api keys", %{client: client} do
+    assert {:ok, %Tesla.Env{} = env} = Typesense.ApiKeys.list(client)
+    assert env.status == 200
+    assert is_list(env.body["keys"])
+  end
 end

@@ -12,4 +12,9 @@ defmodule Typesense.ApiKeys do
     client
     |> Tesla.get("/keys/#{key_id}")
   end
+
+  def list(client) do
+    client
+    |> Tesla.get("/keys")
+  end
 end
