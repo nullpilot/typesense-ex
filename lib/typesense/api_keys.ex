@@ -7,4 +7,9 @@ defmodule Typesense.ApiKeys do
     client
     |> Tesla.post("/keys", key_props)
   end
+
+  def retrieve(client, key_id) do
+    client
+    |> Tesla.get("/keys/#{key_id}")
+  end
 end
