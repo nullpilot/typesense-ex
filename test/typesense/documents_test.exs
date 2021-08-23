@@ -121,8 +121,18 @@ defmodule Typesense.DocumentsTest do
     Typesense.Documents.create(client, collection, doc1)
     Typesense.Documents.create(client, collection, doc2)
 
-    assert {:ok, %Tesla.Env{} = env} =
-             Typesense.Documents.export(client, collection)
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Documents.export(client, collection)
+
+    assert env.status == 200
+  end
+
+  test "import documents", %{client: client, collection: collection} do
+    doc1 = build(:document)
+    doc2 = build(:document)
+
+    Typesense.Documents.import(client, collection, [doc1, doc2], action: "create", batch_size: 5)
+
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Documents.export(client, collection)
 
     assert env.status == 200
   end

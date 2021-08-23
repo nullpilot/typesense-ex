@@ -31,6 +31,11 @@ defmodule Typesense.Documents do
     |> Tesla.get("/collections/#{collection}/documents/export", query: export_params)
   end
 
+  def import(client, collection, documents, import_params \\ []) do
+    client
+    |> Tesla.post("/collections/#{collection}/documents/import", documents, query: import_params)
+  end
+
   def delete(client, collection, document_id) do
     client
     |> Tesla.delete("/collections/#{collection}/documents/#{document_id}")
