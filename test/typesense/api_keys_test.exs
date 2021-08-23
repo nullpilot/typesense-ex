@@ -50,4 +50,16 @@ defmodule Typesense.ApiKeysTest do
     assert env.status == 200
     assert env.body["id"] == key_id
   end
+
+  test "create scoped search key" do
+    search_key = "RN23GFr1s6jQ9kgSNg2O7fYcAUXU7127"
+    embedded_params = ~s({"filter_by":"company_id:124","expires_at":1906054106})
+
+    expected_key =
+      "OW9DYWZGS1Q1RGdSbmo0S1QrOWxhbk9PL2kxbTU1eXA3bCthdmE5eXJKRT1STjIzeyJmaWx0ZXJfYnkiOiJjb21wYW55X2lkOjEyNCIsImV4cGlyZXNfYXQiOjE5MDYwNTQxMDZ9"
+
+    scoped_key = Typesense.ApiKeys.generate_scoped_search_key(search_key, embedded_params)
+
+    assert scoped_key == expected_key
+  end
 end

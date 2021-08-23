@@ -22,4 +22,12 @@ defmodule Typesense.ApiKeys do
     client
     |> Tesla.delete("/keys/#{key_id}")
   end
+
+  def generate_scoped_search_key(search_key, embedded_params) do
+    digest = Base.encode64(:crypto.mac(:hmac, :sha256, search_key, embedded_params))
+    trimmed_api_key = String.slice(search_key, 0, 4)
+
+    "#{digest}#{trimmed_api_key}#{embedded_params}"
+    |> Base.encode64()
+  end
 end
