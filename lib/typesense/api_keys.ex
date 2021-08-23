@@ -17,4 +17,9 @@ defmodule Typesense.ApiKeys do
     client
     |> Tesla.get("/keys")
   end
+
+  def delete(client, key_id) do
+    client
+    |> Tesla.delete("/keys/#{key_id}")
+  end
 end

@@ -36,4 +36,18 @@ defmodule Typesense.ApiKeysTest do
     assert env.status == 200
     assert is_list(env.body["keys"])
   end
+
+  test "delete existing api key", %{client: client} do
+    key_props = %{
+      "description" => "Search Key.",
+      "actions" => ["document:search"],
+      "collections" => ["*"]
+    }
+
+    {:ok, %{body: %{"id" => key_id}}} = Typesense.ApiKeys.create(client, key_props)
+
+    assert {:ok, %Tesla.Env{} = env} = Typesense.ApiKeys.delete(client, key_id)
+    assert env.status == 200
+    assert env.body["id"] == key_id
+  end
 end
