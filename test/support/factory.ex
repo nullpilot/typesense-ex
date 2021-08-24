@@ -4,8 +4,10 @@ defmodule Typesense.Factory do
   use ExMachina
 
   def collection_factory do
+    random_name = "collection-" <> Base.encode16(:crypto.strong_rand_bytes(4))
+
     %{
-      "name" => sequence("collection"),
+      "name" => random_name,
       "default_sorting_field" => "order",
       "fields" => [
         build(:field, %{

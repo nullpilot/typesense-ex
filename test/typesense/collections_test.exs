@@ -10,13 +10,13 @@ defmodule Typesense.CollectionsTest do
   end
 
   test "creates a new collection", %{client: client} do
-    schema = build(:collection, %{"name" => "createcollection"})
+    schema = build(:collection)
 
     assert {:ok, %Tesla.Env{} = env} = Typesense.Collections.create(client, schema)
     assert env.status == 201
 
     assert %{
-             "name" => "createcollection",
+             "name" => _,
              "num_documents" => _,
              "created_at" => _,
              "fields" => _,
