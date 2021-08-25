@@ -17,4 +17,9 @@ defmodule Typesense.Overrides do
     client
     |> Tesla.get("/collections/#{collection_id}/overrides/#{override_id}")
   end
+
+  def delete(client, collection_id, override_id) do
+    client
+    |> Tesla.delete("/collections/#{collection_id}/overrides/#{override_id}")
+  end
 end

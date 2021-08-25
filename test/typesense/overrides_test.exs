@@ -78,14 +78,34 @@ defmodule Typesense.CurationTest do
         "match" => "exact"
       },
       "includes" => [
-        %{"id" => "1", "position" => 1},
+        %{"id" => "1", "position" => 1}
       ]
     }
 
     Typesense.Overrides.upsert(client, collection, "customize-apple", override)
 
+    assert {:ok, %Tesla.Env{} = env} =
+             Typesense.Overrides.retrieve(client, collection, "customize-apple")
 
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Overrides.retrieve(client, collection, "customize-apple")
+    assert env.status == 200
+  end
+
+  test "delete existing override", %{client: client, collection: collection} do
+    override = %{
+      "rule" => %{
+        "query" => "cherry",
+        "match" => "exact"
+      },
+      "includes" => [
+        %{"id" => "1", "position" => 1}
+      ]
+    }
+
+    Typesense.Overrides.upsert(client, collection, "customize-cherry", override)
+
+    assert {:ok, %Tesla.Env{} = env} =
+             Typesense.Overrides.delete(client, collection, "customize-cherry")
+
     assert env.status == 200
   end
 
