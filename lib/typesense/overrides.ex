@@ -12,4 +12,9 @@ defmodule Typesense.Overrides do
     client
     |> Tesla.get("/collections/#{collection_id}/overrides")
   end
+
+  def retrieve(client, collection_id, override_id) do
+    client
+    |> Tesla.get("/collections/#{collection_id}/overrides/#{override_id}")
+  end
 end

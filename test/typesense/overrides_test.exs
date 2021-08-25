@@ -71,6 +71,24 @@ defmodule Typesense.CurationTest do
     assert is_list(env.body["overrides"])
   end
 
+  test "retrieve existing override", %{client: client, collection: collection} do
+    override = %{
+      "rule" => %{
+        "query" => "apple",
+        "match" => "exact"
+      },
+      "includes" => [
+        %{"id" => "1", "position" => 1},
+      ]
+    }
+
+    Typesense.Overrides.upsert(client, collection, "customize-apple", override)
+
+
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Overrides.retrieve(client, collection, "customize-apple")
+    assert env.status == 200
+  end
+
   defp insert_fruit(client, collection_name, name) do
     {:ok, %{status: 201}} =
       Typesense.Documents.create(
