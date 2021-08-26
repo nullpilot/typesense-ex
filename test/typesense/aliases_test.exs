@@ -23,4 +23,10 @@ defmodule Typesense.CurationTest do
 
     assert env.status == 200
   end
+
+  test "list existing aliases", %{client: client} do
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Aliases.list(client)
+    assert env.status == 200
+    assert is_list(env.body["aliases"])
+  end
 end

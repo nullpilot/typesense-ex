@@ -7,4 +7,9 @@ defmodule Typesense.Aliases do
     client
     |> Tesla.put("/aliases/#{collection_alias}", %{collection_name: collection_name})
   end
+
+  def list(client) do
+    client
+    |> Tesla.get("/aliases")
+  end
 end
