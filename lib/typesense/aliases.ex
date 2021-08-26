@@ -12,4 +12,9 @@ defmodule Typesense.Aliases do
     client
     |> Tesla.get("/aliases")
   end
+
+  def retrieve(client, collection_alias) do
+    client
+    |> Tesla.get("/aliases/#{collection_alias}")
+  end
 end
