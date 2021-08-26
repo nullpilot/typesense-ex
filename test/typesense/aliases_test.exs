@@ -36,7 +36,15 @@ defmodule Typesense.CurationTest do
     Typesense.Aliases.upsert(client, collection_alias, collection)
 
     assert {:ok, %Tesla.Env{} = env} = Typesense.Aliases.retrieve(client, collection_alias)
+    assert env.status == 200
+  end
 
+  test "delete existing override", %{client: client, collection: collection} do
+    collection_alias = "alias-" <> Base.encode16(:crypto.strong_rand_bytes(4))
+
+    Typesense.Aliases.upsert(client, collection_alias, collection)
+
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Aliases.delete(client, collection_alias)
     assert env.status == 200
   end
 end

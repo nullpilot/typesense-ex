@@ -17,4 +17,9 @@ defmodule Typesense.Aliases do
     client
     |> Tesla.get("/aliases/#{collection_alias}")
   end
+
+  def delete(client, collection_alias) do
+    client
+    |> Tesla.delete("/aliases/#{collection_alias}")
+  end
 end
