@@ -39,7 +39,7 @@ defmodule Typesense.AliasesTest do
     assert env.status == 200
   end
 
-  test "delete existing override", %{client: client, collection: collection} do
+  test "delete existing alias", %{client: client, collection: collection} do
     collection_alias = "alias-" <> Base.encode16(:crypto.strong_rand_bytes(4))
 
     Typesense.Aliases.upsert(client, collection_alias, collection)
