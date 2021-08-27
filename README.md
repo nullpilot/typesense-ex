@@ -1,21 +1,11 @@
-# Typesense
+# TypesenseEx
 
-**TODO: Add description**
+TypesenseEx is a client library for [Typesense](https://typesense.org/).
 
-## Installation
+**WIP.** Not ready for use yet.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `typesense` to your list of dependencies in `mix.exs`:
+## Testing
 
-```elixir
-def deps do
-  [
-    {:typesense, "~> 0.1.0"}
-  ]
-end
-```
+Testing is not fully isolated and does not clean up all changes, so it is best to only run tests against an ephemeral instance of Typesense.
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/typesense](https://hexdocs.pm/typesense).
-
+A script to run a local Typesense instance using Docker is included.
