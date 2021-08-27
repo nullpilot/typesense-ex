@@ -1,4 +1,4 @@
-defmodule Typesense.CurationTest do
+defmodule Typesense.AliasesTest do
   use ExUnit.Case
 
   import Typesense.Factory
