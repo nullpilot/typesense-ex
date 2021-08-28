@@ -17,4 +17,14 @@ defmodule Typesense.Cluster do
     client
     |> Tesla.get("/health")
   end
+
+  def snapshot(client, snapshot_path) do
+    client
+    |> Tesla.post("/operations/snapshot", "", query: [snapshot_path: snapshot_path])
+  end
+
+  def perform_vote(client) do
+    client
+    |> Tesla.post("/operations/vote", "")
+  end
 end
