@@ -38,4 +38,10 @@ defmodule Typesense.ClusterTest do
     assert env.status == 200
     assert match?(%{"system_disk_used_bytes" => _}, env.body)
   end
+
+  test "get api stats", %{client: client} do
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Cluster.stats(client)
+    assert env.status == 200
+    assert match?(%{"latency_ms" => _}, env.body)
+  end
 end

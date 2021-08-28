@@ -39,4 +39,9 @@ defmodule Typesense.Cluster do
     client
     |> Tesla.get("/metrics.json")
   end
+
+  def stats(client) do
+    client
+    |> Tesla.get("/stats.json")
+  end
 end
