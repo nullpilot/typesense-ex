@@ -27,4 +27,11 @@ defmodule Typesense.Cluster do
     client
     |> Tesla.post("/operations/vote", "")
   end
+
+  def toggle_slow_request_log(client, threshold_in_ms) do
+    client
+    |> Tesla.post("/config", %{
+      "log-slow-requests-time-ms" => threshold_in_ms
+    })
+  end
 end

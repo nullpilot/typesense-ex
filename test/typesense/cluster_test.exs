@@ -26,4 +26,10 @@ defmodule Typesense.ClusterTest do
     assert env.status == 200
     assert match?(%{"success" => _}, env.body)
   end
+
+  test "toggle slow request logs", %{client: client} do
+    assert {:ok, %Tesla.Env{} = env} = Typesense.Cluster.toggle_slow_request_log(client, 50)
+    assert env.status == 201
+    assert match?(%{"success" => _}, env.body)
+  end
 end
