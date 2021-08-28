@@ -34,4 +34,9 @@ defmodule Typesense.Cluster do
       "log-slow-requests-time-ms" => threshold_in_ms
     })
   end
+
+  def metrics(client) do
+    client
+    |> Tesla.get("/metrics.json")
+  end
 end
