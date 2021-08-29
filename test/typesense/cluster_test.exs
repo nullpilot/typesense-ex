@@ -8,9 +8,8 @@ defmodule Typesense.ClusterTest do
   end
 
   test "checks connectivity to healthy Typesense node", %{client: client} do
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Cluster.health(client)
-    assert env.status == 200
-    assert env.body == %{"ok" => true}
+    assert {:ok, response} = Typesense.Cluster.health(client)
+    assert response == %{"ok" => true}
   end
 
   test "creates a snapshot", %{client: client} do
