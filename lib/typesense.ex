@@ -6,9 +6,10 @@ defmodule Typesense do
   # build dynamic client based on runtime arguments
   def client(opts \\ []) do
     middleware = [
+      Typesense.ApiMiddleware,
       {Tesla.Middleware.BaseUrl, get_opt(opts, :base_url)},
-      Tesla.Middleware.JSON,
-      {Tesla.Middleware.Headers, [{"x-typesense-api-key", get_opt(opts, :api_key)}]}
+      {Tesla.Middleware.Headers, [{"x-typesense-api-key", get_opt(opts, :api_key)}]},
+      Tesla.Middleware.JSON
     ]
 
     Tesla.client(middleware)

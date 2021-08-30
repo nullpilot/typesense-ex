@@ -1,5 +1,14 @@
-defmodule Typesense.ApiCall do
+defmodule Typesense.ApiMiddleware do
   @moduledoc false
+
+  @behaviour Tesla.Middleware
+
+  @impl Tesla.Middleware
+  def call(env, next, _options) do
+    env
+    |> Tesla.run(next)
+    |> handle_response()
+  end
 
   def handle_response({:ok, %{status: status, body: body}}) when status >= 200 and status < 300 do
     {:ok, body}

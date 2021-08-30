@@ -16,7 +16,6 @@ defmodule Typesense.Cluster do
   def health(client) do
     client
     |> Tesla.get("/health")
-    |> Typesense.ApiCall.handle_response()
   end
 
   def snapshot(client, snapshot_path) do
