@@ -8,7 +8,7 @@ defmodule Typesense.AliasesTest do
     schema = build(:collection)
     collection_name = schema["name"]
 
-    {:ok, %{status: 201}} = Typesense.Collections.create(client, schema)
+    {:ok, _} = Typesense.Collections.create(client, schema)
 
     on_exit(fn -> Typesense.Collections.delete(client, collection_name) end)
 
@@ -16,35 +16,40 @@ defmodule Typesense.AliasesTest do
   end
 
   test "create new alias", %{client: client, collection: collection} do
-    collection_alias = "alias-" <> Base.encode16(:crypto.strong_rand_bytes(4))
+    collection_alias = build(:alias)
 
-    assert {:ok, %Tesla.Env{} = env} =
-             Typesense.Aliases.upsert(client, collection_alias, collection)
-
-    assert env.status == 200
+    {:ok, response} = Typesense.Aliases.upsert(client, collection_alias, collection)
+    assert %{"name" => ^collection_alias, "collection_name" => ^collection} = response
   end
 
   test "list existing aliases", %{client: client} do
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Aliases.list(client)
-    assert env.status == 200
-    assert is_list(env.body["aliases"])
+    {:ok, response} = Typesense.Aliases.list(client)
+    assert is_list(response["aliases"])
   end
 
   test "retrieve existing alias", %{client: client, collection: collection} do
-    collection_alias = "alias-" <> Base.encode16(:crypto.strong_rand_bytes(4))
-
+    collection_alias = build(:alias)
     Typesense.Aliases.upsert(client, collection_alias, collection)
 
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Aliases.retrieve(client, collection_alias)
-    assert env.status == 200
+    {:ok, response} = Typesense.Aliases.retrieve(client, collection_alias)
+    assert %{"name" => ^collection_alias, "collection_name" => ^collection} = response
   end
 
   test "delete existing alias", %{client: client, collection: collection} do
-    collection_alias = "alias-" <> Base.encode16(:crypto.strong_rand_bytes(4))
-
+    collection_alias = build(:alias)
     Typesense.Aliases.upsert(client, collection_alias, collection)
 
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Aliases.delete(client, collection_alias)
-    assert env.status == 200
+    {:ok, response} = Typesense.Aliases.delete(client, collection_alias)
+    assert %{"name" => ^collection_alias, "collection_name" => ^collection} = response
+  end
+
+  test "delete alias that does not exist", %{client: client} do
+    collection_alias = build(:alias)
+    assert {:error, {:not_found, _}} = Typesense.Aliases.delete(client, collection_alias)
+  end
+
+  test "delete alias from collection that does not exist", %{client: client} do
+    collection_alias = build(:alias)
+    assert {:error, {:not_found, _}} = Typesense.Aliases.delete(client, collection_alias)
   end
 end

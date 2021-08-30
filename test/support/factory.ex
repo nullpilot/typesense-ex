@@ -40,4 +40,8 @@ defmodule Typesense.Factory do
       "query_by" => "name"
     }
   end
+
+  def alias_factory(_attrs) do
+    "alias-" <> Base.encode16(:crypto.strong_rand_bytes(4))
+  end
 end
