@@ -14,8 +14,7 @@ defmodule Typesense.ApiKeysTest do
       "collections" => ["*"]
     }
 
-    assert {:ok, %Tesla.Env{} = env} = Typesense.ApiKeys.create(client, key_props)
-    assert env.status == 201
+    assert {:ok, %{"value" => _}} = Typesense.ApiKeys.create(client, key_props)
   end
 
   test "retrieve data of an existing api key", %{client: client} do
@@ -25,16 +24,14 @@ defmodule Typesense.ApiKeysTest do
       "collections" => ["*"]
     }
 
-    {:ok, %{body: %{"id" => key_id}}} = Typesense.ApiKeys.create(client, key_props)
+    {:ok, %{"id" => key_id}} = Typesense.ApiKeys.create(client, key_props)
 
-    assert {:ok, %Tesla.Env{} = env} = Typesense.ApiKeys.retrieve(client, key_id)
-    assert env.status == 200
+    assert {:ok, %{"value_prefix" => _}} = Typesense.ApiKeys.retrieve(client, key_id)
   end
 
   test "list api keys", %{client: client} do
-    assert {:ok, %Tesla.Env{} = env} = Typesense.ApiKeys.list(client)
-    assert env.status == 200
-    assert is_list(env.body["keys"])
+    assert {:ok, response} = Typesense.ApiKeys.list(client)
+    assert is_list(response["keys"])
   end
 
   test "delete existing api key", %{client: client} do
@@ -44,11 +41,9 @@ defmodule Typesense.ApiKeysTest do
       "collections" => ["*"]
     }
 
-    {:ok, %{body: %{"id" => key_id}}} = Typesense.ApiKeys.create(client, key_props)
+    {:ok, %{"id" => key_id}} = Typesense.ApiKeys.create(client, key_props)
 
-    assert {:ok, %Tesla.Env{} = env} = Typesense.ApiKeys.delete(client, key_id)
-    assert env.status == 200
-    assert env.body["id"] == key_id
+    assert {:ok, %{"id" => ^key_id}} = Typesense.ApiKeys.delete(client, key_id)
   end
 
   test "create scoped search key" do
