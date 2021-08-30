@@ -8,39 +8,27 @@ defmodule Typesense.ClusterTest do
   end
 
   test "checks connectivity to healthy Typesense node", %{client: client} do
-    assert {:ok, response} = Typesense.Cluster.health(client)
-    assert response == %{"ok" => true}
+    assert {:ok, %{"ok" => true}} = Typesense.Cluster.health(client)
   end
 
   test "creates a snapshot", %{client: client} do
     snapshot_path = "/tmp/typesense-data-snapshot"
-
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Cluster.snapshot(client, snapshot_path)
-    assert env.status == 201
-    assert env.body == %{"success" => true}
+    assert {:ok, %{"success" => true}} = Typesense.Cluster.snapshot(client, snapshot_path)
   end
 
   test "initiates leader vote", %{client: client} do
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Cluster.perform_vote(client)
-    assert env.status == 200
-    assert match?(%{"success" => _}, env.body)
+    assert {:ok, %{"success" => _}} = Typesense.Cluster.perform_vote(client)
   end
 
   test "toggle slow request logs", %{client: client} do
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Cluster.toggle_slow_request_log(client, 50)
-    assert env.status == 201
-    assert match?(%{"success" => _}, env.body)
+    assert {:ok, %{"success" => true}} = Typesense.Cluster.toggle_slow_request_log(client, 50)
   end
 
   test "get cluster metrics", %{client: client} do
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Cluster.metrics(client)
-    assert env.status == 200
-    assert match?(%{"system_disk_used_bytes" => _}, env.body)
+    assert {:ok, %{"system_disk_used_bytes" => _}} = Typesense.Cluster.metrics(client)
   end
 
   test "get api stats", %{client: client} do
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Cluster.stats(client)
-    assert env.status == 200
-    assert match?(%{"latency_ms" => _}, env.body)
+    assert {:ok, %{"latency_ms" => _}} = Typesense.Cluster.stats(client)
   end
 end
