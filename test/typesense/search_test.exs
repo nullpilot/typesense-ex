@@ -5,7 +5,6 @@ defmodule Typesense.SearchTest do
 
   setup_all do
     client = Typesense.client()
-    collection_name = "searchcollection"
 
     order_field =
       build(:field, %{
@@ -21,15 +20,15 @@ defmodule Typesense.SearchTest do
 
     schema =
       build(:collection, %{
-        "name" => collection_name,
         "fields" => [
           order_field,
           text_field
         ]
       })
 
-    {:ok, %{status: 201}} = Typesense.Collections.create(client, schema)
+    {:ok, _response} = Typesense.Collections.create(client, schema)
 
+    collection_name = schema["name"]
     insert_fruit(client, collection_name, "Pears")
     insert_fruit(client, collection_name, "Peas")
     insert_fruit(client, collection_name, "Orange")
@@ -47,10 +46,7 @@ defmodule Typesense.SearchTest do
   test "search a collection and return results", %{client: client, collection: collection} do
     search_params = build(:search, %{"q" => "pea", "query_by" => "name"})
 
-    assert {:ok, %Tesla.Env{} = env} =
-             Typesense.Documents.search(client, collection, search_params)
-
-    assert 200 == env.status
+    assert {:ok, _response} = Typesense.Documents.search(client, collection, search_params)
   end
 
   test "search a collection using multisearch and return results", %{
@@ -64,15 +60,14 @@ defmodule Typesense.SearchTest do
       %{"q" => "berr"}
     ]
 
-    assert {:ok, %Tesla.Env{} = env} =
+    assert {:ok, response} =
              Typesense.Documents.multi_search(client, search_requests, common_params)
 
-    assert 200 == env.status
-    assert 2 = length(env.body["results"])
+    assert 2 = length(response["results"])
   end
 
   defp insert_fruit(client, collection_name, name) do
-    {:ok, %{status: 201}} =
+    {:ok, _response} =
       Typesense.Documents.create(
         client,
         collection_name,
