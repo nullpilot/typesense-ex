@@ -5,7 +5,6 @@ defmodule Typesense.OverridesTest do
 
   setup_all do
     client = Typesense.client()
-    collection_name = "searchcollection"
 
     order_field =
       build(:field, %{
@@ -21,15 +20,15 @@ defmodule Typesense.OverridesTest do
 
     schema =
       build(:collection, %{
-        "name" => collection_name,
         "fields" => [
           order_field,
           text_field
         ]
       })
 
-    {:ok, %{status: 201}} = Typesense.Collections.create(client, schema)
+    {:ok, _response} = Typesense.Collections.create(client, schema)
 
+    collection_name = schema["name"]
     insert_fruit(client, collection_name, "Pears")
     insert_fruit(client, collection_name, "Peas")
     insert_fruit(client, collection_name, "Orange")
@@ -59,16 +58,13 @@ defmodule Typesense.OverridesTest do
       ]
     }
 
-    assert {:ok, %Tesla.Env{} = env} =
+    assert {:ok, _response} =
              Typesense.Overrides.upsert(client, collection, "customize-apple", override)
-
-    assert env.status == 200
   end
 
   test "list existing overrides", %{client: client, collection: collection} do
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Overrides.list(client, collection)
-    assert env.status == 200
-    assert is_list(env.body["overrides"])
+    assert {:ok, response} = Typesense.Overrides.list(client, collection)
+    assert is_list(response["overrides"])
   end
 
   test "retrieve existing override", %{client: client, collection: collection} do
@@ -84,10 +80,7 @@ defmodule Typesense.OverridesTest do
 
     Typesense.Overrides.upsert(client, collection, "customize-apple", override)
 
-    assert {:ok, %Tesla.Env{} = env} =
-             Typesense.Overrides.retrieve(client, collection, "customize-apple")
-
-    assert env.status == 200
+    assert {:ok, _response} = Typesense.Overrides.retrieve(client, collection, "customize-apple")
   end
 
   test "delete existing override", %{client: client, collection: collection} do
@@ -103,14 +96,11 @@ defmodule Typesense.OverridesTest do
 
     Typesense.Overrides.upsert(client, collection, "customize-cherry", override)
 
-    assert {:ok, %Tesla.Env{} = env} =
-             Typesense.Overrides.delete(client, collection, "customize-cherry")
-
-    assert env.status == 200
+    assert {:ok, _response} = Typesense.Overrides.delete(client, collection, "customize-cherry")
   end
 
   defp insert_fruit(client, collection_name, name) do
-    {:ok, %{status: 201}} =
+    {:ok, _response} =
       Typesense.Documents.create(
         client,
         collection_name,
