@@ -8,7 +8,7 @@ defmodule Typesense.SynonymsTest do
     schema = build(:collection)
     collection_name = schema["name"]
 
-    {:ok, %{status: 201}} = Typesense.Collections.create(client, schema)
+    {:ok, _response} = Typesense.Collections.create(client, schema)
 
     on_exit(fn -> Typesense.Collections.delete(client, collection_name) end)
 
@@ -20,10 +20,8 @@ defmodule Typesense.SynonymsTest do
       synonyms: ["blazer", "coat", "jacket"]
     }
 
-    assert {:ok, %Tesla.Env{} = env} =
+    assert {:ok, _response} =
              Typesense.Synonyms.upsert(client, collection, "coat-synonyms", synonyms)
-
-    assert env.status == 200
   end
 
   test "create new one-way synonym", %{client: client, collection: collection} do
@@ -32,16 +30,13 @@ defmodule Typesense.SynonymsTest do
       synonyms: ["iphone", "android"]
     }
 
-    assert {:ok, %Tesla.Env{} = env} =
+    assert {:ok, _response} =
              Typesense.Synonyms.upsert(client, collection, "smart-phone-synonyms", synonyms)
-
-    assert env.status == 200
   end
 
   test "list existing synonym", %{client: client, collection: collection} do
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Synonyms.list(client, collection)
-    assert env.status == 200
-    assert is_list(env.body["synonyms"])
+    assert {:ok, response} = Typesense.Synonyms.list(client, collection)
+    assert is_list(response["synonyms"])
   end
 
   test "retrieve existing synonym", %{client: client, collection: collection} do
@@ -53,8 +48,7 @@ defmodule Typesense.SynonymsTest do
 
     Typesense.Synonyms.upsert(client, collection, synonym_id, synonyms)
 
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Synonyms.retrieve(client, collection, synonym_id)
-    assert env.status == 200
+    assert {:ok, _response} = Typesense.Synonyms.retrieve(client, collection, synonym_id)
   end
 
   test "delete existing synonym", %{client: client, collection: collection} do
@@ -66,7 +60,6 @@ defmodule Typesense.SynonymsTest do
 
     Typesense.Synonyms.upsert(client, collection, synonym_id, synonyms)
 
-    assert {:ok, %Tesla.Env{} = env} = Typesense.Synonyms.delete(client, collection, synonym_id)
-    assert env.status == 200
+    assert {:ok, _response} = Typesense.Synonyms.delete(client, collection, synonym_id)
   end
 end
