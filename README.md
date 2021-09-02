@@ -2,7 +2,7 @@
 
 TypesenseEx is a client library for [Typesense](https://typesense.org/).
 
-**WIP.** Not ready for use yet.
+**WIP.** Not recommended for production use. Expect breaking changes.
 
 ## Testing
 
