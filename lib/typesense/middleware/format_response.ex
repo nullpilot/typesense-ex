@@ -1,5 +1,9 @@
 defmodule Typesense.Middleware.FormatResponse do
-  @moduledoc false
+  @moduledoc """
+  This module unwraps the Tesla `{:ok, %Tesla.Env}` response to an `{:ok, content}` or `{:error, error}` tuple respectively.
+
+  Note that `error` itself is currently a tuple in the form of `{status :: Atom, message :: String.t}` and may be replaced by custom error objects at a later point.
+  """
 
   @behaviour Tesla.Middleware
 
