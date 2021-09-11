@@ -10,6 +10,8 @@ defmodule Typesense.ApiMiddleware do
     |> handle_response()
   end
 
+  def handle_response({:error, error}), do: {:error, error}
+
   def handle_response({:ok, %{status: status, body: body}}) when status >= 200 and status < 300 do
     {:ok, body}
   end
