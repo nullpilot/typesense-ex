@@ -1,4 +1,4 @@
-defmodule Typesense.ApiMiddleware do
+defmodule Typesense.Middleware.FormatResponse do
   @moduledoc false
 
   @behaviour Tesla.Middleware
