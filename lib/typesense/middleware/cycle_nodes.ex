@@ -14,6 +14,8 @@ defmodule Typesense.Middleware.CycleNodes do
       (float between 0 and 1, defaults to 0.2)
   """
 
+  alias Typesense.Healthcheck
+
   @behaviour Tesla.Middleware
 
   @defaults [
@@ -38,8 +40,7 @@ defmodule Typesense.Middleware.CycleNodes do
       url: env.url,
       current_node: nil,
       current_node_index: -1,
-      fallback_attempts: 0,
-      node_health: %{}
+      fallback_attempts: 0
     }
 
     {env, context} = apply_next_node(env, context)
@@ -77,14 +78,17 @@ defmodule Typesense.Middleware.CycleNodes do
   end
 
   defp apply_next_node(env, context) do
-    context = fail_health_check(context)
+    fail_health_check(context)
     {context, node} = get_next_node(context)
 
     apply_node(env, context, node)
   end
 
   defp get_next_node(%{nearest_node: nearest_node} = context) when nearest_node !== nil do
-    if is_node_viable(context.node_health, context.nearest_node, context.healthcheck_interval) do
+    if Healthcheck.is_viable(
+         context.nearest_node,
+         context.healthcheck_interval
+       ) do
       {context, nearest_node}
     else
       fallback_node(%{context | fallback_attempts: length(context.nodes)})
@@ -97,29 +101,25 @@ defmodule Typesense.Middleware.CycleNodes do
   defp fallback_node(
          %{
            nodes: nodes,
-           node_health: node_health,
            healthcheck_interval: healthcheck_interval,
            current_node_index: index,
            fallback_attempts: attempts
          } = context
        ) do
     index = Integer.mod(index + 1, length(nodes))
-    node = Enum.at(nodes, index)
+    node_url = Enum.at(nodes, index)
 
     context = %{context | current_node_index: index, fallback_attempts: attempts - 1}
 
     cond do
-      is_node_viable(node_health, node, healthcheck_interval) -> {context, node}
-      attempts > 1 -> fallback_node(%{context | fallback_attempts: attempts - 1})
-      true -> {context, node}
-    end
-  end
+      Healthcheck.is_viable(node_url, healthcheck_interval) ->
+        {context, node_url}
 
-  # Checks if the node is either healthy, or enough time has passed to check if it has recovered.
-  defp is_node_viable(node_health, node_url, healthcheck_interval) do
-    case Map.get(node_health, node_url) do
-      nil -> true
-      last_failure -> System.system_time(:millisecond) - healthcheck_interval > last_failure
+      attempts > 1 ->
+        fallback_node(%{context | fallback_attempts: attempts - 1})
+
+      true ->
+        {context, node_url}
     end
   end
 
@@ -135,11 +135,10 @@ defmodule Typesense.Middleware.CycleNodes do
     "#{node.protocol}://#{node.host}:#{node.port}/"
   end
 
-  defp fail_health_check(%{current_node: nil} = context), do: context
+  defp fail_health_check(%{current_node: nil}), do: nil
 
-  defp fail_health_check(%{current_node: current_node, node_health: node_health} = context) do
-    node_health = Map.put(node_health, current_node, System.system_time(:millisecond))
-    %{context | node_health: node_health}
+  defp fail_health_check(%{current_node: current_node}) do
+    Healthcheck.fail_check(current_node)
   end
 
   # Join paths, taken from Tesla.Middleware.BaseUrl
