@@ -17,11 +17,6 @@ config :typesense,
       protocol: 'http',
       host: 'localhost',
       port: '8208'
-    ],
-    [
-      protocol: 'http',
-      host: 'localhost',
-      port: '8108'
     ]
   ],
   api_key_in_query: false,
