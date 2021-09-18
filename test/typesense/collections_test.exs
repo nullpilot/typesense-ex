@@ -1,13 +1,5 @@
 defmodule Typesense.CollectionsTest do
-  use ExUnit.Case
-
-  import Typesense.Factory
-
-  setup do
-    client = Typesense.client()
-
-    {:ok, %{client: client}}
-  end
+  use Typesense.ApiCase
 
   test "creates a new collection", %{client: client} do
     schema = build(:collection)

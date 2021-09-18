@@ -1,10 +1,7 @@
 defmodule Typesense.DocumentsTest do
-  use ExUnit.Case
+  use Typesense.ApiCase
 
-  import Typesense.Factory
-
-  setup_all do
-    client = Typesense.client()
+  setup_all %{client: client} do
     collection_name = "doccollection"
 
     order_field =

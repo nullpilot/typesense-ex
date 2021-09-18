@@ -1,11 +1,5 @@
 defmodule Typesense.ClusterTest do
-  use ExUnit.Case
-
-  setup do
-    client = Typesense.client()
-
-    {:ok, %{client: client}}
-  end
+  use Typesense.ApiCase
 
   test "checks connectivity to healthy Typesense node", %{client: client} do
     assert {:ok, %{"ok" => true}} = Typesense.Cluster.health(client)

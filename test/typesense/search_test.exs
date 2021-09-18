@@ -1,11 +1,7 @@
 defmodule Typesense.SearchTest do
-  use ExUnit.Case
+  use Typesense.ApiCase
 
-  import Typesense.Factory
-
-  setup_all do
-    client = Typesense.client()
-
+  setup_all %{client: client} do
     order_field =
       build(:field, %{
         "name" => "order",

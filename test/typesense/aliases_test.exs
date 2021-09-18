@@ -1,10 +1,7 @@
 defmodule Typesense.AliasesTest do
-  use ExUnit.Case
+  use Typesense.ApiCase
 
-  import Typesense.Factory
-
-  setup_all do
-    client = Typesense.client()
+  setup_all %{client: client} do
     schema = build(:collection)
     collection_name = schema["name"]
 
@@ -12,7 +9,7 @@ defmodule Typesense.AliasesTest do
 
     on_exit(fn -> Typesense.Collections.delete(client, collection_name) end)
 
-    {:ok, %{client: client, collection: collection_name}}
+    {:ok, %{collection: collection_name}}
   end
 
   test "create new alias", %{client: client, collection: collection} do

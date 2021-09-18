@@ -1,11 +1,5 @@
 defmodule Typesense.ApiKeysTest do
-  use ExUnit.Case
-
-  setup do
-    client = Typesense.client()
-
-    {:ok, %{client: client}}
-  end
+  use Typesense.ApiCase
 
   test "create new api key", %{client: client} do
     key_props = %{
