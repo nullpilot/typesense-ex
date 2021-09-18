@@ -10,7 +10,8 @@ defmodule Typesense.Application do
     children = [
       # Starts a worker by calling: Typesense.Worker.start_link(arg)
       # {Typesense.Worker, arg}
-      :hackney_pool.child_spec(__MODULE__, Typesense.Config.resolve(:pool_options))
+      :hackney_pool.child_spec(__MODULE__, Typesense.Config.resolve(:pool_options)),
+      Typesense.Healthcheck
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
