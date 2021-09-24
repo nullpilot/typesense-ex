@@ -1,6 +1,8 @@
 defmodule Typesense.OverridesTest do
   use Typesense.ApiCase
 
+  alias Typesense.Overrides
+
   setup_all %{client: client} do
     order_field =
       build(:field, %{
@@ -54,12 +56,11 @@ defmodule Typesense.OverridesTest do
       ]
     }
 
-    assert {:ok, _response} =
-             Typesense.Overrides.upsert(client, collection, "customize-apple", override)
+    assert {:ok, _response} = Overrides.upsert(client, collection, "customize-apple", override)
   end
 
   test "list existing overrides", %{client: client, collection: collection} do
-    assert {:ok, response} = Typesense.Overrides.list(client, collection)
+    assert {:ok, response} = Overrides.list(client, collection)
     assert is_list(response["overrides"])
   end
 
@@ -74,9 +75,9 @@ defmodule Typesense.OverridesTest do
       ]
     }
 
-    Typesense.Overrides.upsert(client, collection, "customize-apple", override)
+    Overrides.upsert(client, collection, "customize-apple", override)
 
-    assert {:ok, _response} = Typesense.Overrides.retrieve(client, collection, "customize-apple")
+    assert {:ok, _response} = Overrides.retrieve(client, collection, "customize-apple")
   end
 
   test "delete existing override", %{client: client, collection: collection} do
@@ -90,9 +91,9 @@ defmodule Typesense.OverridesTest do
       ]
     }
 
-    Typesense.Overrides.upsert(client, collection, "customize-cherry", override)
+    Overrides.upsert(client, collection, "customize-cherry", override)
 
-    assert {:ok, _response} = Typesense.Overrides.delete(client, collection, "customize-cherry")
+    assert {:ok, _response} = Overrides.delete(client, collection, "customize-cherry")
   end
 
   defp insert_fruit(client, collection_name, name) do
