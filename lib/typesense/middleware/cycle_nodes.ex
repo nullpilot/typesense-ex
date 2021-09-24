@@ -1,29 +1,16 @@
 defmodule Typesense.Middleware.CycleNodes do
   @moduledoc """
-  Cycle through a list of node if requests fail.
+  Internal middleware that combines Tesla's Retry and BaseURL middlewares to try different nodes whenever requests fail.
 
-  Heavily based on Tesla's Retry middleware.
+  The base URL is set based on the first available node, preferring the nearest node option when set.
+  Whenever a request fails, that node will be marked as unavailable and the next node will be chosen, based on order in the config and availability.
 
-  ## Options
-
-  - `:delay` - The base delay in milliseconds (positive integer, defaults to 50)
-  - `:max_retries` - maximum number of retries (non-negative integer, defaults to 5)
-  - `:max_delay` - maximum delay in milliseconds (positive integer, defaults to 5000)
-  - `:should_retry` - function to determine if request should be retried
-  - `:jitter_factor` - additive noise proportionality constant
-      (float between 0 and 1, defaults to 0.2)
+  A node is considered available as long as no requests to it failed within the configured `healthcheck_interval`.
   """
 
   alias Typesense.Healthcheck
 
   @behaviour Tesla.Middleware
-
-  @defaults [
-    delay: 50,
-    max_retries: 5,
-    max_delay: 5_000,
-    jitter_factor: 0.2
-  ]
 
   @impl Tesla.Middleware
   def call(env, next, opts) do
@@ -31,12 +18,12 @@ defmodule Typesense.Middleware.CycleNodes do
 
     context = %{
       retries: 0,
-      nearest_node: Keyword.get(opts, :nearest_node) |> valid_node(),
-      nodes: Keyword.get(opts, :nodes, []) |> Enum.map(&valid_node/1),
-      delay: integer_opt!(opts, :retry_interval, 1),
-      max_retries: integer_opt!(opts, :max_retries, 0),
+      nearest_node: Keyword.get(opts, :nearest_node) |> node_url(),
+      nodes: Keyword.get(opts, :nodes, []) |> Enum.map(&node_url/1),
+      delay: Keyword.get(opts, :retry_interval, 1),
+      max_retries: Keyword.get(opts, :max_retries, 0),
       should_retry: Keyword.get(opts, :should_retry, &match?({:error, _}, &1)),
-      healthcheck_interval: integer_opt!(opts, :healthcheck_interval, 2_000),
+      healthcheck_interval: Keyword.get(opts, :healthcheck_interval, 2_000),
       url: env.url,
       current_node: nil,
       current_node_index: -1,
@@ -63,18 +50,13 @@ defmodule Typesense.Middleware.CycleNodes do
     res = Tesla.run(env, next)
 
     if context.should_retry.(res) do
-      backoff(context.delay)
+      :timer.sleep(context.delay)
       context = update_in(context, [:retries], &(&1 + 1))
       {env, context} = apply_next_node(env, context)
       retry(env, next, context)
     else
       res
     end
-  end
-
-  # Exponential backoff with jitter
-  defp backoff(delay) do
-    :timer.sleep(delay)
   end
 
   defp apply_next_node(env, context) do
@@ -128,9 +110,9 @@ defmodule Typesense.Middleware.CycleNodes do
     {%{env | url: join_paths(current_node, context.url)}, %{context | current_node: current_node}}
   end
 
-  defp valid_node(nil), do: nil
+  defp node_url(nil), do: nil
 
-  defp valid_node(raw_node) do
+  defp node_url(raw_node) do
     node = Enum.into(raw_node, %{})
     "#{node.protocol}://#{node.host}:#{node.port}/"
   end
@@ -141,7 +123,7 @@ defmodule Typesense.Middleware.CycleNodes do
     Healthcheck.fail_check(current_node)
   end
 
-  # Join paths, taken from Tesla.Middleware.BaseUrl
+  # Join paths, from Tesla.Middleware.BaseUrl
   defp join_paths(base, url) do
     case {String.last(to_string(base)), url} do
       {nil, url} -> url
@@ -151,17 +133,5 @@ defmodule Typesense.Middleware.CycleNodes do
       {_, "/" <> rest} -> base <> "/" <> rest
       {_, rest} -> base <> "/" <> rest
     end
-  end
-
-  defp integer_opt!(opts, key, min) do
-    case Keyword.fetch(opts, key) do
-      {:ok, value} when is_integer(value) and value >= min -> value
-      {:ok, invalid} -> invalid_integer(key, invalid, min)
-      :error -> @defaults[key]
-    end
-  end
-
-  defp invalid_integer(key, value, min) do
-    raise(ArgumentError, "expected :#{key} to be an integer >= #{min}, got #{inspect(value)}")
   end
 end
