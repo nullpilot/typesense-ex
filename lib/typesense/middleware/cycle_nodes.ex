@@ -17,17 +17,17 @@ defmodule Typesense.Middleware.CycleNodes do
     opts = opts || []
 
     context = %{
-      retries: 0,
-      nearest_node: Keyword.get(opts, :nearest_node) |> node_url(),
-      nodes: Keyword.get(opts, :nodes, []) |> Enum.map(&node_url/1),
-      delay: Keyword.get(opts, :retry_interval, 1),
-      max_retries: Keyword.get(opts, :max_retries, 0),
-      should_retry: Keyword.get(opts, :should_retry, &match?({:error, _}, &1)),
-      healthcheck_interval: Keyword.get(opts, :healthcheck_interval, 2_000),
-      url: env.url,
       current_node: nil,
       current_node_index: -1,
-      fallback_attempts: 0
+      delay: Keyword.get(opts, :retry_interval, 1),
+      fallback_attempts: 0,
+      healthcheck_interval: Keyword.get(opts, :healthcheck_interval, 2_000),
+      max_retries: Keyword.get(opts, :max_retries, 0),
+      nearest_node: Keyword.get(opts, :nearest_node) |> node_url(),
+      nodes: Keyword.get(opts, :nodes, []) |> Enum.map(&node_url/1),
+      retries: 0,
+      should_retry: Keyword.get(opts, :should_retry, &match?({:error, _}, &1)),
+      url: env.url
     }
 
     {env, context} = apply_next_node(env, context)
