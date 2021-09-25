@@ -26,7 +26,6 @@ defmodule Typesense.Middleware.CycleNodes do
       nearest_node: Keyword.get(opts, :nearest_node) |> node_url(),
       nodes: Keyword.get(opts, :nodes, []) |> Enum.map(&node_url/1),
       retries: 0,
-      should_retry: Keyword.get(opts, :should_retry, &match?({:error, _}, &1)),
       url: env.url
     }
 
@@ -49,7 +48,7 @@ defmodule Typesense.Middleware.CycleNodes do
   defp retry(env, next, context) do
     res = Tesla.run(env, next)
 
-    if context.should_retry.(res) do
+    if should_retry?(res) do
       :timer.sleep(context.delay)
       context = update_in(context, [:retries], &(&1 + 1))
       {env, context} = apply_next_node(env, context)
@@ -58,6 +57,10 @@ defmodule Typesense.Middleware.CycleNodes do
       res
     end
   end
+
+  defp should_retry?({:ok, %{status: status}}) when status in 500..599, do: true
+  defp should_retry?({:ok, _}), do: false
+  defp should_retry?({:error, _}), do: true
 
   defp apply_next_node(env, context) do
     fail_health_check(context)
