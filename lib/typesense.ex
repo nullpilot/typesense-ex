@@ -17,7 +17,6 @@ defmodule Typesense do
          retry_interval: Config.resolve(:retry_interval, opts),
          healthcheck_interval: Config.resolve(:healthcheck_interval, opts)
        ]},
-      {Tesla.Middleware.Logger, []},
       {Tesla.Middleware.Headers, [{"x-typesense-api-key", Config.resolve(:api_key, opts)}]},
       Tesla.Middleware.JSON
     ]
