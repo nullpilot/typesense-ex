@@ -6,7 +6,10 @@
       strict: true,
       files: %{
         included: ["mix.exs", "lib/", "test/"]
-      }
+      },
+      checks: [
+        {Credo.Check.Consistency.ExceptionNames, false}
+      ]
     }
   ]
 }

@@ -42,11 +42,11 @@ defmodule Typesense.AliasesTest do
 
   test "delete alias that does not exist", %{client: client} do
     collection_alias = build(:alias)
-    assert {:error, {:not_found, _}} = Typesense.Aliases.delete(client, collection_alias)
+    assert {:error, %ObjectNotFound{}} = Typesense.Aliases.delete(client, collection_alias)
   end
 
   test "delete alias from collection that does not exist", %{client: client} do
     collection_alias = build(:alias)
-    assert {:error, {:not_found, _}} = Typesense.Aliases.delete(client, collection_alias)
+    assert {:error, %ObjectNotFound{}} = Typesense.Aliases.delete(client, collection_alias)
   end
 end

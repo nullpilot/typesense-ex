@@ -1,18 +1,28 @@
 defmodule Typesense.CollectionsTest do
   use Typesense.ApiCase
 
-  test "creates a new collection", %{client: client} do
-    schema = build(:collection)
+  describe "create/2" do
+    test "creates a new collection", %{client: client} do
+      schema = build(:collection)
 
-    assert {:ok,
-            %{
-              "name" => _,
-              "num_documents" => _,
-              "created_at" => _,
-              "fields" => _,
-              "default_sorting_field" => _,
-              "num_memory_shards" => _
-            }} = Typesense.Collections.create(client, schema)
+      assert {:ok,
+              %{
+                "name" => _,
+                "num_documents" => _,
+                "created_at" => _,
+                "fields" => _,
+                "default_sorting_field" => _,
+                "num_memory_shards" => _
+              }} = Typesense.Collections.create(client, schema)
+    end
+
+    test "fails on duplicate ID", %{client: client} do
+      schema = build(:collection)
+
+      {:ok, _} = Typesense.Collections.create(client, schema)
+
+      assert {:error, %ObjectAlreadyExists{}} = Typesense.Collections.create(client, schema)
+    end
   end
 
   test "retrieves an existing collection", %{client: client} do

@@ -7,6 +7,18 @@ defmodule Typesense.ApiCase do
   using do
     quote do
       import Typesense.Factory
+
+      alias Typesense.Error.{
+        HTTPError,
+        MissingConfiguration,
+        ObjectAlreadyExists,
+        ObjectNotFound,
+        ObjectUnprocessable,
+        RequestMalformed,
+        RequestUnauthorized,
+        ServerError,
+        TimeoutError
+      }
     end
   end
 

@@ -5,6 +5,16 @@ defmodule Typesense.Middleware.FormatResponse do
   Note that `error` itself is currently a tuple in the form of `{status :: Atom, message :: String.t}` and may be replaced by custom error objects at a later point.
   """
 
+  alias Typesense.Error.{
+    HTTPError,
+    ObjectAlreadyExists,
+    ObjectNotFound,
+    ObjectUnprocessable,
+    RequestMalformed,
+    RequestUnauthorized,
+    ServerError
+  }
+
   @behaviour Tesla.Middleware
 
   @impl Tesla.Middleware
@@ -14,7 +24,7 @@ defmodule Typesense.Middleware.FormatResponse do
     |> handle_response()
   end
 
-  def handle_response({:error, error}), do: {:error, error}
+  def handle_response({:error, error}), do: {:error, %HTTPError{error: error}}
 
   def handle_response({:ok, %{status: status, body: body}}) when status >= 200 and status < 300 do
     {:ok, body}
@@ -31,11 +41,19 @@ defmodule Typesense.Middleware.FormatResponse do
   end
 
   defp error_response(status, message) when status >= 500 and status <= 599,
-    do: {:error, {:server_error, message}}
+    do: {:error, %ServerError{status: status, message: message}}
 
-  defp error_response(400, message), do: {:error, {:bad_request, message}}
-  defp error_response(401, message), do: {:error, {:unauthorized, message}}
-  defp error_response(404, message), do: {:error, {:not_found, message}}
-  defp error_response(409, message), do: {:error, {:conflict, message}}
-  defp error_response(422, message), do: {:error, {:unprocessable_entity, message}}
+  defp error_response(400, message),
+    do: {:error, %RequestMalformed{status: 400, message: message}}
+
+  defp error_response(401, message),
+    do: {:error, %RequestUnauthorized{status: 401, message: message}}
+
+  defp error_response(404, message), do: {:error, %ObjectNotFound{status: 404, message: message}}
+
+  defp error_response(409, message),
+    do: {:error, %ObjectAlreadyExists{status: 409, message: message}}
+
+  defp error_response(422, message),
+    do: {:error, %ObjectUnprocessable{status: 422, message: message}}
 end
